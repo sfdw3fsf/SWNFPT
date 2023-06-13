@@ -3,7 +3,7 @@ const leaderRouter = express.Router();
 const bodyParser = require('body-parser');
 // const express = require('express');
 const Leader = require('../models/leaders');
-
+var authenticate = require('../authenticate');
 // const leaderRouter = express.Router();
 
 leaderRouter.route('/')
@@ -16,7 +16,7 @@ leaderRouter.route('/')
       })
       .catch((err) => next(err));
   })
-  .post((req, res, next) => {
+  .post(authenticate.verifyUser, (req, res, next) => {
     Leader.create(req.body)
       .then((leader) => {
         console.log('Leader created:', leader);
@@ -42,7 +42,7 @@ leaderRouter.route('/:leaderId')
       })
       .catch((err) => next(err));
   })
-  .put((req, res, next) => {
+  .put(authenticate.verifyUser, (req, res, next) => {
     Leader.findByIdAndUpdate(req.params.leaderId, {
       $set: req.body
     }, { new: true })
@@ -62,7 +62,7 @@ leaderRouter.route('/:leaderId')
       })
       .catch((err) => next(err));
   })
-  .delete((req, res, next) => {
+  .delete(authenticate.verifyUser, (req, res, next) => {
     Leader.findByIdAndDelete(req.params.leaderId)
       .then((response) => {
         if (response) {
