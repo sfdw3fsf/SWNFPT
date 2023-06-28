@@ -8,7 +8,7 @@ var FileStore = require('session-file-store')(session);
 var passport = require('passport');
 var authenticate = require('./authenticate');
 var config = require('./config');
-
+const uploadRouter = require('./routes/uploadRouter');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -17,6 +17,7 @@ var app = express();
 var dishRouter = require('./routes/dishRouter');
 var promoRouter = require('./routes/promoRouter');
 var leaderRouter = require('./routes/leaderRouter');
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -36,21 +37,21 @@ app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-function auth (req, res, next) {
+function auth(req, res, next) {
 
   if (!req.user) {
 
-      var err = new Error('You are not authenticated!');        
-      err.status = 403;
-      next(err);
-      return;
+    var err = new Error('You are not authenticated!');
+    err.status = 403;
+    next(err);
+    return;
   }
   else {
-      next();
+    next();
   }
 }
 app.use(auth);
-
+app.use('/imageUpload', uploadRouter);
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -61,7 +62,7 @@ app.use('/dishes', dishRouter);
 app.use('/promotions', promoRouter)
 app.use('/leaders', leaderRouter);
 
-
+app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
